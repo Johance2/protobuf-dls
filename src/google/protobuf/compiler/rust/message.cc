@@ -185,7 +185,8 @@ void MessageDebug(Context& ctx, const Descriptor& msg) {
 void CppMessageExterns(Context& ctx, const Descriptor& msg) {
   ABSL_CHECK(ctx.is_cpp());
   ctx.Emit(
-      {{"new_thunk", ThunkName(ctx, msg, "new")},
+      {
+       {"new_thunk", ThunkName(ctx, msg, "new")},
        {"default_instance_thunk", ThunkName(ctx, msg, "default_instance")}},
       R"rs(
       fn $new_thunk$() -> $pbr$::RawMessage;
@@ -1155,7 +1156,11 @@ void GenerateRs(Context& ctx, const Descriptor& msg) {
 
   ctx.printer().PrintRaw("\n");
   if (ctx.is_cpp()) {
-    ctx.Emit({{"Msg", RsSafeName(msg.name())}}, R"rs(
+    ctx.Emit(
+        {
+         {"Msg", RsSafeName(msg.name())}},
+        R"rs(
+
       impl<'a> $Msg$Mut<'a> {
         pub unsafe fn __unstable_wrap_cpp_grant_permission_to_break(
             msg: &'a mut *mut $std$::ffi::c_void) -> Self {
@@ -1307,35 +1312,34 @@ void GenerateThunksCc(Context& ctx, const Descriptor& msg) {
     return;
   }
 
-  ctx.Emit(
-      {{"abi", "\"C\""},  // Workaround for syntax highlight bug in VSCode.
-       {"Msg", RsSafeName(msg.name())},
-       {"QualifiedMsg", cpp::QualifiedClassName(&msg)},
-       {"new_thunk", ThunkName(ctx, msg, "new")},
-       {"default_instance_thunk", ThunkName(ctx, msg, "default_instance")},
-       {"nested_msg_thunks",
-        [&] {
-          for (int i = 0; i < msg.nested_type_count(); ++i) {
-            GenerateThunksCc(ctx, *msg.nested_type(i));
-          }
-        }},
-       {"accessor_thunks",
-        [&] {
-          for (int i = 0; i < msg.field_count(); ++i) {
-            GenerateAccessorThunkCc(ctx, *msg.field(i));
-          }
-        }},
-       {"oneof_thunks",
-        [&] {
-          for (int i = 0; i < msg.real_oneof_decl_count(); ++i) {
-            GenerateOneofThunkCc(ctx, *msg.real_oneof_decl(i));
-          }
-        }}},
-      R"cc(
-        //~ $abi$ is a workaround for a syntax highlight bug in VSCode.
-        // However, ~ that confuses clang-format (it refuses to keep the
-        // newline after ~ `$abi${`). Disabling clang-format for the block.
-        // clang-format off
+  ctx.Emit({{"abi", "\"C\""},  // Workaround for syntax highlight bug in VSCode.
+            {"Msg", RsSafeName(msg.name())},
+            {"QualifiedMsg", cpp::QualifiedClassName(&msg)},
+            {"new_thunk", ThunkName(ctx, msg, "new")},
+            {"default_instance_thunk", ThunkName(ctx, msg, "default_instance")},
+            {"nested_msg_thunks",
+             [&] {
+               for (int i = 0; i < msg.nested_type_count(); ++i) {
+                 GenerateThunksCc(ctx, *msg.nested_type(i));
+               }
+             }},
+            {"accessor_thunks",
+             [&] {
+               for (int i = 0; i < msg.field_count(); ++i) {
+                 GenerateAccessorThunkCc(ctx, *msg.field(i));
+               }
+             }},
+            {"oneof_thunks",
+             [&] {
+               for (int i = 0; i < msg.real_oneof_decl_count(); ++i) {
+                 GenerateOneofThunkCc(ctx, *msg.real_oneof_decl(i));
+               }
+             }}},
+           R"cc(
+             //~ $abi$ is a workaround for a syntax highlight bug in VSCode.
+             // However, ~ that confuses clang-format (it refuses to keep the
+             // newline after ~ `$abi${`). Disabling clang-format for the block.
+             // clang-format off
         extern $abi$ {
         void* $new_thunk$() { return new $QualifiedMsg$(); }
 
@@ -1347,10 +1351,10 @@ void GenerateThunksCc(Context& ctx, const Descriptor& msg) {
 
             $oneof_thunks$
         }  // extern $abi$
-        // clang-format on
+             // clang-format on
 
-        $nested_msg_thunks$
-      )cc");
+             $nested_msg_thunks$
+           )cc");
 }
 
 }  // namespace rust
