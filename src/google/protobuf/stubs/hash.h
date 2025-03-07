@@ -103,8 +103,13 @@
 // http://blogs.msdn.com/vcblog/archive/2009/05/25/stl-breaking-changes-in-visual-studio-2010-beta-1.aspx
 // And.. they are moved back to stdext in MSVC 2013 (haven't checked 2012). That
 // said, use unordered_map for MSVC 2010 and beyond is our safest bet.
+
 #elif defined(_MSC_VER)
-# if _MSC_VER >= 1600  // Since Visual Studio 2010
+# if _MSC_VER >= 1940  // Since Visual Studio 2022
+#  define GOOGLE_PROTOBUF_HAS_CXX11_HASH
+#  define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#  define GOOGLE_PROTOBUF_HASH_COMPARE stdext::hash_compare
+# elif _MSC_VER >= 1600  // Since Visual Studio 2010
 #  define GOOGLE_PROTOBUF_HAS_CXX11_HASH
 #  define GOOGLE_PROTOBUF_HASH_COMPARE std::hash_compare
 # elif _MSC_VER >= 1500  // Since Visual Studio 2008
