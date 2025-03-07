@@ -65,7 +65,7 @@ ReflectionClassGenerator::~ReflectionClassGenerator() {
 void ReflectionClassGenerator::Generate(io::Printer* printer) {
   WriteIntroduction(printer);
 
-  WriteDescriptor(printer);
+  //WriteDescriptor(printer);
   // Close the class declaration.
   printer->Outdent();
   printer->Print("}\n");

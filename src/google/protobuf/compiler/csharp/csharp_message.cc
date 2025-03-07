@@ -108,6 +108,13 @@ void MessageGenerator::Generate(io::Printer* printer) {
   map<string, string> vars;
   vars["class_name"] = class_name();
   vars["access_level"] = class_access_level();
+  auto full_name = full_class_name();
+  full_name = full_name.substr(8);
+  full_name = StringReplace(full_name, ".Types.", ".", true);
+  full_name[0] = tolower(full_name[0]);
+
+  vars["full_class_name"] = full_name;
+
 
   WriteMessageDocComment(printer, descriptor_);
   AddDeprecatedFlag(printer);
@@ -137,20 +144,35 @@ void MessageGenerator::Generate(io::Printer* printer) {
         + ".Descriptor.NestedTypes[" + SimpleItoa(descriptor_->index()) + "]";
   }
 
+ // WriteGeneratedCodeAttributes(printer);
+ // printer->Print(
+	//vars,
+	//"public static pbr::MessageDescriptor Descriptor {\n"
+	//"  get { return $descriptor_accessor$; }\n"
+	//"}\n"
+	//"\n");
+ // WriteGeneratedCodeAttributes(printer);
+ // printer->Print(
+	//vars,
+ //   "pbr::MessageDescriptor pb::IMessage.Descriptor {\n"
+ //   "  get { return Descriptor; }\n"
+ //   "}\n"
+ //   "\n");
   WriteGeneratedCodeAttributes(printer);
   printer->Print(
-	vars,
-	"public static pbr::MessageDescriptor Descriptor {\n"
-	"  get { return $descriptor_accessor$; }\n"
-	"}\n"
-	"\n");
+      vars,
+      "public static string FullName {\n"
+      "  get { return \"$full_class_name$\"; }\n"
+      "}\n"
+      "\n");
   WriteGeneratedCodeAttributes(printer);
   printer->Print(
-	vars,
-    "pbr::MessageDescriptor pb::IMessage.Descriptor {\n"
-    "  get { return Descriptor; }\n"
-    "}\n"
-    "\n");
+      vars,
+      "string pb::IMessage.FullName {\n"
+      "  get { return FullName; }\n"
+      "}\n"
+      "\n");
+
   // CustomOptions property, only for options messages
   if (IsDescriptorOptionMessage(descriptor_)) {
     printer->Print(

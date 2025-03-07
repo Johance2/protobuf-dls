@@ -116,7 +116,8 @@ std::string GetFileNamespace(const FileDescriptor* descriptor) {
   if (descriptor->options().has_csharp_namespace()) {
     return descriptor->options().csharp_namespace();
   }
-  return UnderscoresToCamelCase(descriptor->package(), true, true);
+  return descriptor->package();
+  //return UnderscoresToCamelCase(descriptor->package(), true, true);
 }
 
 // Returns the Pascal-cased last part of the proto file. For example,
@@ -268,7 +269,8 @@ std::string TryRemovePrefix(const std::string& prefix, const std::string& value)
 // result in an enum value in C# called just Blue
 std::string GetEnumValueName(const std::string& enum_name, const std::string& enum_value_name) {
   std::string stripped = TryRemovePrefix(enum_name, enum_value_name);
-  std::string result = ShoutyToPascalCase(stripped);
+  //std::string result = ShoutyToPascalCase(stripped);
+  std::string result = (stripped);
   // Just in case we have an enum name of FOO and a value of FOO_2... make sure the returned
   // string is a valid identifier.
   if (ascii_isdigit(result[0])) {
@@ -328,7 +330,8 @@ std::string GetFieldConstantName(const FieldDescriptor* field) {
 
 std::string GetPropertyName(const FieldDescriptor* descriptor) {
   // TODO(jtattermusch): consider introducing csharp_property_name field option
-  std::string property_name = UnderscoresToPascalCase(GetFieldName(descriptor));
+    std::string property_name = (GetFieldName(descriptor));
+  //std::string property_name = UnderscoresToPascalCase(GetFieldName(descriptor));
   // Avoid either our own type name or reserved names. Note that not all names
   // are reserved - a field called to_string, write_to etc would still cause a problem.
   // There are various ways of ending up with naming collisions, but we try to avoid obvious
