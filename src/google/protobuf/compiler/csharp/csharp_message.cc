@@ -117,12 +117,7 @@ void MessageGenerator::Generate(io::Printer* printer) {
   std::map<string, string> vars;
   vars["class_name"] = class_name();
   vars["access_level"] = class_access_level();
-  auto full_name = full_class_name();
-  full_name = full_name.substr(8);
-  full_name = StringReplace(full_name, ".Types.", ".", true);
-  full_name[0] = tolower(full_name[0]);
-
-  vars["full_class_name"] = full_name;
+  vars["full_name"] = descriptor_->full_name();
 
   WriteMessageDocComment(printer, descriptor_);
   AddDeprecatedFlag(printer);
@@ -217,7 +212,7 @@ void MessageGenerator::Generate(io::Printer* printer) {
   printer->Print(
       vars,
       "public static string FullName {\n"
-      "  get { return \"$full_class_name$\"; }\n"
+      "  get { return \"$full_name$\"; }\n"
       "}\n"
       "\n");
   WriteGeneratedCodeAttributes(printer);
